@@ -1,6 +1,6 @@
 import Database from "../Database/index.js";
 export default function CourseRoutes(app) {
-    app.get("/api/courses/", (req, res) => {
+    app.get("/api/courses/:id", (req, res) => {
         const { id } = req.params;
         const course = Database.courses
           .find((c) => c._id === id);
