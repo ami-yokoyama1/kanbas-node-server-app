@@ -4,6 +4,9 @@ import Lab5 from './Lab5.js';
 import cors from "cors";
 import CourseRoutes from "./Kanbas/courses/routes.js";
 import ModuleRoutes from "./Kanbas/modules/routes.js";
+import mongoose from "mongoose";
+
+mongoose.connect("congodb://127.0.0.1:27017/kanbas");
 const app = express();
 app.use(cors());
 CourseRoutes(app);
