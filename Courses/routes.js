@@ -1,13 +1,16 @@
-import Database from "../Kanbas/Database/index.js";
+// import Database from "../Kanbas/Database/index.js";
+import * as dao from "./dao.js";
+
 export default function CourseRoutes(app) {
-    app.get("/api/courses/:id", (req, res) => {
+    app.get("/api/courses/:id", async (req, res) => {
         const { id } = req.params;
-        const course = Database.courses
-          .find((c) => c._id === id);
-        if (!course) {
-          res.status(404).send("Course not found");
-          return;
-        }
+        const course = await dao.findCourseById(id);
+        // const course = Database.courses
+        //   .find((c) => c._id === id);
+        // if (!course) {
+        //   res.status(404).send("Course not found");
+        //   return;
+        // }
         res.send(course);
       });    
     app.put("/api/courses/:id", (req, res) => {
@@ -30,8 +33,8 @@ export default function CourseRoutes(app) {
         Database.courses.push(course);
         res.send(course);
     });    
-    app.get("/api/courses", (req, res) => {
-        const courses = Database.courses;
+    app.get("/api/courses", async (req, res) => {
+        const courses = await dao.findAllCourses();
         res.send(courses);
     });
 }

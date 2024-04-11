@@ -1,4 +1,5 @@
 import "dotenv/config";
+import session from "express-session";
 import express from 'express';
 import Hello from './Hello.js';
 import Lab5 from './Lab5.js';
@@ -21,12 +22,12 @@ const sessionOptions = {
     saveUninitialized: false,
 };
 if (process.env.NODE_ENV !== "development") {
-sessionOptions.proxy = true;
-sessionOptions.cookie = {
-    sameSite: "none",
-    secure: true,
-    domain: process.env.HTTP_SERVER_DOMAIN,
-};
+    sessionOptions.proxy = true;
+    sessionOptions.cookie = {
+        sameSite: "none",
+        secure: true,
+        domain: process.env.HTTP_SERVER_DOMAIN,
+    };
 }
     app.use(session(sessionOptions));      
 // const sessionOptions = {
