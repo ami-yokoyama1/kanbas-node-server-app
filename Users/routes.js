@@ -1,5 +1,5 @@
 import * as dao from "./dao.js";
-let currentUser = null;
+// let currentUser = null;
 export default function UserRoutes(app) {
   const createUser = async (req, res) => {
     const user = await dao.createUser(req.body);
@@ -14,9 +14,16 @@ export default function UserRoutes(app) {
 
   app.delete("/api/users/:userId", deleteUser);
   const findAllUsers = async (req, res) => { 
-      const users = await dao.findAllUsers();
+    const { role } = req.query;
+    if (role) {
+      const users = await dao.findUsersByRole(role);
       res.json(users);
-    };
+      return;
+    }
+    const users = await dao.findAllUsers();
+    res.json(users);
+    return;
+  };
   app.get("/api/users", findAllUsers);
   
   const findUserById = async (req, res) => { 
@@ -32,17 +39,42 @@ export default function UserRoutes(app) {
     res.json(status);
   };
 
-  const signup = async (req, res) => { };
+  const signup = async (req, res) => {
+    const user = await dao.findUserByUsername(req.body.username);
+    if (user) {
+      res.status(400).json(
+        { message: "Username already taken" });
+    }
+    const currentUser = await dao.createUser(req.body);
+    req.session["currentUser"] = currentUser;
+    res.json(currentUser);
+  };
+  app.post("/api/users/signup", signup);
 
   const signin = async (req, res) => { 
     const { username, password } = req.body;
-    currentUser = await dao.findUserByCredentials(username, password);
-    res.json(currentUser);
+    const currentUser = await dao.findUserByCredentials(username, password);
+    if (currentUser) {
+      req.session["currentUser"] = currentUser;
+      res.json(currentUser);
+    }else{
+      res.sendStatus(401);
+    }
   };
 
-  const signout = (req, res) => { };
+  const signout = (req, res) => {
+    // currentUser = null;
+    req.session.destroy();
+    res.sendStatus(200);
+  };
+  app.post("/api/users/signout", signout);
 
   const profile = async (req, res) => {
+    const currentUser = req.session["currentUser"];
+    if (!currentUser) {
+      res.sendStatus(401);
+      return;
+    }
     res.json(currentUser);
   };
   app.post("/api/users/signin", signin);
@@ -50,7 +82,5 @@ export default function UserRoutes(app) {
   
   // app.get("/api/users", findAllUsers);
   app.put("/api/users/:userId", updateUser);
-  app.post("/api/users/signup", signup);
 
-  app.post("/api/users/signout", signout);
 }
