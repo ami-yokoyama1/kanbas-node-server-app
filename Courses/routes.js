@@ -27,6 +27,7 @@ export default function CourseRoutes(app) {
         // );
         // res.sendStatus(204);
       });    
+      
 
     app.delete("/api/courses/:id", async (req, res) => {
         const { id } = req.params;
